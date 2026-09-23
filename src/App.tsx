@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useGame } from './hooks/useGame';
 import { GameBoard } from './components/GameBoard';
+import { EducationOverlay } from './components/EducationOverlay';
+import { NumberJourneyModal } from './components/NumberJourneyModal';
 import { audio } from './utils/audio';
 import { LEVELS } from './utils/levels';
 import './index.css';
@@ -14,7 +16,9 @@ function App() {
     const [showValues, setShowValues] = useState(false);
     const [showHowToPlay, setShowHowToPlay] = useState(false);
     const [showLevelSelect, setShowLevelSelect] = useState(false);
+    const [showJourney, setShowJourney] = useState(false);
     const [soundEnabled, setSoundEnabled] = useState(true);
+    const [educationEnabled, setEducationEnabled] = useState(true);
     const [hasStarted, setHasStarted] = useState(false);
 
     const toggleSound = (enabled: boolean) => {
@@ -57,6 +61,7 @@ function App() {
                     <div className="controls">
                         <button className="btn btn-secondary" onClick={() => setShowHowToPlay(true)}>Help</button>
                         <button className="btn btn-secondary" onClick={() => setShowLevelSelect(true)}>Levels</button>
+                        <button className="btn btn-secondary" onClick={() => setShowJourney(true)}>Journey</button>
                         <button className="btn btn-primary" onClick={restart}>Restart</button>
                     </div>
                 </div>
@@ -77,11 +82,20 @@ function App() {
                         />
                         <span>Sound</span>
                     </label>
+                    <label>
+                        <input 
+                            type="checkbox" 
+                            checked={educationEnabled} 
+                            onChange={e => setEducationEnabled(e.target.checked)} 
+                        />
+                        <span>Education Mode</span>
+                    </label>
                 </div>
             </header>
 
             <main className="game-container">
                 <GameBoard board={board} showValue={showValues} onMove={move} />
+                <EducationOverlay board={board} enabled={educationEnabled} />
 
                 {(gameOver || (won && !keptGoing)) && (
                     <div className="game-overlay">
@@ -135,6 +149,8 @@ function App() {
                     </div>
                 </div>
             )}
+
+            {showJourney && <NumberJourneyModal onClose={() => setShowJourney(false)} />}
         </div>
     );
 }

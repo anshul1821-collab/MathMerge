@@ -484,3 +484,173 @@ header h1 {
   box-shadow: 0 6px 15px rgba(0,0,0,0.3), inset 0 -4px 0 rgba(0,0,0,0.15) !important;
   border-radius: 15px !important;
 }
+
+/* Educational Layer Styles */
+.edu-overlay-container {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.merge-toast {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  animation: toastFade 2s ease-in-out forwards;
+  white-space: nowrap;
+}
+
+@keyframes toastFade {
+  0% { opacity: 0; transform: translate(-50%, -80%); }
+  10% { opacity: 1; transform: translate(-50%, -100%); }
+  80% { opacity: 1; transform: translate(-50%, -100%); }
+  100% { opacity: 0; transform: translate(-50%, -120%); }
+}
+
+.edu-popup, .edu-challenge {
+  pointer-events: auto;
+}
+
+.challenge-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.challenge-option-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.challenge-option-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.challenge-hint {
+  color: #fbbf24;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.journey-track {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.journey-node {
+  background: rgba(255,255,255,0.1);
+  padding: 10px 15px;
+  border-radius: 12px;
+  min-width: 60px;
+  text-align: center;
+  opacity: 0.5;
+  transition: all 0.3s;
+}
+
+.journey-node.unlocked {
+  opacity: 1;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
+}
+
+.journey-node.current {
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.stat-item {
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-item .label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.stat-item .val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-top: 5px;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.mode-btn {
+  padding: 15px 25px;
+  font-size: 1.2rem;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid transparent;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.mode-btn.active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.mode-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.2);
+}
+
+.concept-checklist {
+  text-align: left;
+  margin-top: 15px;
+}
+
+.concept-checklist li {
+  list-style: none;
+  margin-bottom: 8px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.concept-checklist li.learned {
+  color: #4ade80;
+}
+
