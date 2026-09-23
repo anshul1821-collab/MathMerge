@@ -25,16 +25,16 @@ const MATH_FACTS = [
         text: "Adding zero to a number leaves it unchanged. This is called the additive identity property!",
         subtext: `${mergedValue} + 0 = ${mergedValue}`
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🧩 Number Trivia",
         text: "Every time you merge tiles in this game, you are using the powers of 2 (2, 4, 8, 16, 32...).",
         subtext: `2 × 2 × 2... builds the board!`
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🤓 Geek out!",
         text: "A 'jiffy' is an actual unit of time. It means 1/100th of a second!"
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🔢 Zero Fact",
         text: "Zero is the only number that cannot be represented by Roman numerals."
     }),
@@ -42,39 +42,60 @@ const MATH_FACTS = [
         title: "📐 Geometry Connection",
         text: `If you arrange ${mergedValue} dots in a perfect rectangle, you are finding its factors!`
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🤔 Brain Teaser",
         text: "Odd numbers always end in 1, 3, 5, 7, or 9!"
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🤯 Mind Blown",
         text: "If you multiply any number by 9, the digits of the answer usually add up to 9! (e.g. 9 × 3 = 27, 2+7 = 9)"
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🎯 Target Practice",
         text: "The target number at the top of the screen is your ultimate goal. Every merge gets you closer!"
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🧮 Fast Math",
         text: "To multiply a whole number by 10, you just add a 0 to the end of the number!"
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "🚀 Space Math",
         text: "Math is the universal language. We even used it to send messages to aliens on the Voyager Golden Record!"
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "⚖️ Balancing Act",
         text: "An equation is like a scale. Whatever you do to one side, you must do to the other to keep it balanced."
     }),
-    (mergedValue: number) => ({
+    () => ({
         title: "♾️ Infinity",
         text: "There are infinitely many numbers. No matter how big a number you can think of, there is always one bigger!"
+    }),
+    () => ({
+        title: "🍕 Pizza Math",
+        text: "Fractions are just division! If you cut a pizza into 8 slices and eat 4, you ate 4/8, or 1/2 of the pizza."
+    }),
+    () => ({
+        title: "⏳ Time Travel",
+        text: "There are 86,400 seconds in a single day. Make them count!"
+    }),
+    () => ({
+        title: "🧊 Cool Cube",
+        text: "A cube has 6 faces, 12 edges, and 8 vertices. Dice are perfect examples of cubes!"
+    }),
+    () => ({
+        title: "🔄 Palindrome Numbers",
+        text: "Some numbers read the same forwards and backwards, like 121 or 33. These are called palindromes!"
+    }),
+    () => ({
+        title: "🐝 Nature's Math",
+        text: "Bees build their honeycombs using hexagons because they are the most efficient shape for storing honey!"
     })
 ];
 
 interface EducationOverlayProps {
     board: BoardState;
     enabled: boolean;
+    level: number;
     lockFrequency?: number;
     onLock?: (locked: boolean) => void;
     onMerge?: (text: string, isChallenge: boolean) => void;
@@ -87,10 +108,10 @@ interface ToastInfo {
     c: number;
 }
 
-export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabled, lockFrequency, onLock, onMerge }) => {
+export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabled, level, lockFrequency, onLock, onMerge }) => {
     const { registerMerge, registerChallengeAnswer } = useEducation();
     const [toasts, setToasts] = useState<ToastInfo[]>([]);
-    const [popup, setPopup] = useState<{ type: 'why' | 'challenge' | 'lock_challenge', value?: number, expr?: string, options?: string[], correctOption?: string } | null>(null);
+    const [popup, setPopup] = useState<{ type: 'why' | 'challenge' | 'lock_challenge', value?: number, expr?: string, options?: string[], correctOption?: string, fact?: { title: string; text: string; subtext?: string; } } | null>(null);
     const [challengeOptions, setChallengeOptions] = useState<number[]>([]);
     const [challengeHint, setChallengeHint] = useState<string>('');
     const prevBoardRef = useRef<string>('');
@@ -171,11 +192,14 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                 } else {
                     const rand = Math.random();
                     if (rand < 0.1 && mergedValue >= 8) {
+                        const maxIndex = Math.min(MATH_FACTS.length - 1, 3 + level);
                         if (factOrderRef.current.length === 0) {
-                            factOrderRef.current = MATH_FACTS.map((_, i) => i).sort(() => Math.random() - 0.5);
+                            const allowed = [];
+                            for(let i = 0; i <= maxIndex; i++) allowed.push(i);
+                            factOrderRef.current = allowed.sort(() => Math.random() - 0.5);
                         }
                         const nextFactIndex = factOrderRef.current.shift()!;
-                        const randomFact = MATH_FACTS[nextFactIndex](mergedValue);
+                        const randomFact = MATH_FACTS[nextFactIndex || 0](mergedValue);
                         setPopup({ type: 'why', value: mergedValue, fact: randomFact });
                     } else if (rand > 0.9 && mergedValue >= 8) {
                         // Quick Challenge

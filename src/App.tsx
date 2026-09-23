@@ -3,6 +3,7 @@ import { useGame } from './hooks/useGame';
 import { GameBoard } from './components/GameBoard';
 import { EducationOverlay } from './components/EducationOverlay';
 import { NumberJourneyModal } from './components/NumberJourneyModal';
+import { LevelIntroModal } from './components/LevelIntroModal';
 import { audio } from './utils/audio';
 import { LEVELS } from './utils/levels';
 import './index.css';
@@ -84,6 +85,7 @@ function App() {
     const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('nf_soundEnabled') !== 'false');
     const [educationEnabled, setEducationEnabled] = useState(() => localStorage.getItem('nf_educationEnabled') !== 'false');
     const [hasStarted, setHasStarted] = useState(false);
+    const [showLevelIntro, setShowLevelIntro] = useState(false);
     const [showTargetBreakdown, setShowTargetBreakdown] = useState(false);
     const [solvedEquations, setSolvedEquations] = useState<{id: string, text: string, isChallenge: boolean, count: number}[]>([]);
     const [lockFrequency, setLockFrequency] = useState(() => parseInt(localStorage.getItem('nf_lockFrequency') || '10', 10));
@@ -96,6 +98,12 @@ function App() {
     useEffect(() => {
         if (score === 0) setSolvedEquations([]);
     }, [score, currentLevel]);
+
+    useEffect(() => {
+        if (hasStarted) {
+            setShowLevelIntro(true);
+        }
+    }, [currentLevel, hasStarted]);
 
     const toggleSound = (enabled: boolean) => {
         setSoundEnabled(enabled);
@@ -219,6 +227,7 @@ function App() {
                     <EducationOverlay 
                         board={board} 
                         enabled={educationEnabled} 
+                        level={currentLevel}
                         lockFrequency={lockFrequency}
                         onLock={setIsLocked}
                         onMerge={(text, isChallenge) => setSolvedEquations(prev => {
@@ -330,6 +339,13 @@ function App() {
                         <button className="btn btn-primary modal-close" onClick={() => setShowLevelSelect(false)}>Close</button>
                     </div>
                 </div>
+            )}
+
+            {showLevelIntro && hasStarted && (
+                <LevelIntroModal 
+                    levelConfig={levelConfig} 
+                    onStart={() => setShowLevelIntro(false)} 
+                />
             )}
 
             {showJourney && <NumberJourneyModal onClose={() => setShowJourney(false)} />}
