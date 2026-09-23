@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import type { BoardState } from '../utils/movement';
+import type { BoardState, TileData } from '../utils/movement';
 import { useEducation } from '../hooks/useEducation';
 import { generateExpression } from '../utils/mathGen';
-import type { OperatorType } from '../utils/levels';
+import { LEVELS } from '../utils/levels';
 
 const MATH_FACTS = [
     (mergedValue: number) => ({
@@ -165,14 +165,18 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
             const timer = setTimeout(() => setToasts([]), 2000);
             
             if (!popup) {
-                let chosenCell = null;
-                board.forEach(r => r.forEach(c => { if (c && c.mergedInto) chosenCell = c; }));
+                let chosenCell: TileData | null = null;
+                for (const r of board) {
+                    for (const c of r) {
+                        if (c && c.mergedInto) chosenCell = c;
+                    }
+                }
 
                 if (lockFrequency && lockFrequency > 0 && mergesSinceLastChallenge.current >= lockFrequency && chosenCell?.mergeInfo) {
                     mergesSinceLastChallenge.current = 0;
                     if (onLock) onLock(true);
                     
-                    const ops: OperatorType[] = ['ADD', 'SUB', 'MUL', 'DIV'];
+                    const ops = LEVELS.find(l => l.level === level)?.ops || ['ADD'];
                     const randomTarget = Math.floor(Math.random() * 30) + 5;
                     const randomExprStr = generateExpression(randomTarget, ops);
                     const correct = randomTarget;
@@ -203,7 +207,7 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                         setPopup({ type: 'why', value: mergedValue, fact: randomFact });
                     } else if (rand > 0.9 && mergedValue >= 8) {
                         // Quick Challenge
-                        const ops: OperatorType[] = ['ADD', 'SUB', 'MUL', 'DIV'];
+                        const ops = LEVELS.find(l => l.level === level)?.ops || ['ADD'];
                         const randomTarget = Math.floor(Math.random() * 20) + 5;
                         const randomExprStr = generateExpression(randomTarget, ops);
                         const correct = randomTarget;
