@@ -4,7 +4,7 @@ import type { BoardState } from '../utils/movement';
 import { LEVELS } from '../utils/levels';
 import { audio } from '../utils/audio';
 
-export function useGame() {
+export function useGame(isLocked: boolean = false) {
     const [currentLevel, setCurrentLevel] = useState(1);
     const levelConfig = LEVELS.find(l => l.level === currentLevel) || LEVELS[0];
 
@@ -36,7 +36,7 @@ export function useGame() {
     }, []);
 
     const move = useCallback((direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => {
-        if (gameOver || (won && !keptGoing)) return;
+        if (gameOver || (won && !keptGoing) || isLocked) return;
 
         const { newBoard, score: moveScore, moved } = slide(board, direction, levelConfig.ops);
         if (moved) {
@@ -61,13 +61,14 @@ export function useGame() {
                 setGameOverState(true);
             }
         }
-    }, [board, gameOver, won, keptGoing, bestScore, levelConfig]);
+    }, [board, gameOver, won, keptGoing, bestScore, levelConfig, isLocked]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
                 e.preventDefault();
             }
+            if (isLocked) return;
             switch (e.key) {
                 case 'ArrowUp': move('UP'); break;
                 case 'ArrowDown': move('DOWN'); break;
@@ -77,7 +78,7 @@ export function useGame() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [move]);
+    }, [move, isLocked]);
 
     return { 
         board, score, bestScore, gameOver, won, keptGoing, setKeptGoing, 

@@ -1,10 +1,83 @@
 import React, { useEffect, useState, useRef } from 'react';
 import type { BoardState } from '../utils/movement';
 import { useEducation } from '../hooks/useEducation';
+import { generateExpression } from '../utils/mathGen';
+import type { OperatorType } from '../utils/levels';
+
+const MATH_FACTS = [
+    (mergedValue: number) => ({
+        title: "🧠 Did you notice?",
+        text: "When two identical numbers merge, the result is double the original number.",
+        subtext: `${mergedValue / 2} + ${mergedValue / 2} = ${mergedValue}`
+    }),
+    (mergedValue: number) => ({
+        title: "💡 Did you know?",
+        text: "Multiplication is just repeated addition! Instead of adding the same number over and over, you can multiply.",
+        subtext: `${mergedValue / 2} × 2 = ${mergedValue}`
+    }),
+    (mergedValue: number) => ({
+        title: "🌟 Math Fact!",
+        text: `The number ${mergedValue} is an even number. That means it can be divided perfectly in half without any remainders!`,
+        subtext: `${mergedValue} ÷ 2 = ${mergedValue / 2}`
+    }),
+    (mergedValue: number) => ({
+        title: "✨ Math Magic",
+        text: "Adding zero to a number leaves it unchanged. This is called the additive identity property!",
+        subtext: `${mergedValue} + 0 = ${mergedValue}`
+    }),
+    (mergedValue: number) => ({
+        title: "🧩 Number Trivia",
+        text: "Every time you merge tiles in this game, you are using the powers of 2 (2, 4, 8, 16, 32...).",
+        subtext: `2 × 2 × 2... builds the board!`
+    }),
+    (mergedValue: number) => ({
+        title: "🤓 Geek out!",
+        text: "A 'jiffy' is an actual unit of time. It means 1/100th of a second!"
+    }),
+    (mergedValue: number) => ({
+        title: "🔢 Zero Fact",
+        text: "Zero is the only number that cannot be represented by Roman numerals."
+    }),
+    (mergedValue: number) => ({
+        title: "📐 Geometry Connection",
+        text: `If you arrange ${mergedValue} dots in a perfect rectangle, you are finding its factors!`
+    }),
+    (mergedValue: number) => ({
+        title: "🤔 Brain Teaser",
+        text: "Odd numbers always end in 1, 3, 5, 7, or 9!"
+    }),
+    (mergedValue: number) => ({
+        title: "🤯 Mind Blown",
+        text: "If you multiply any number by 9, the digits of the answer usually add up to 9! (e.g. 9 × 3 = 27, 2+7 = 9)"
+    }),
+    (mergedValue: number) => ({
+        title: "🎯 Target Practice",
+        text: "The target number at the top of the screen is your ultimate goal. Every merge gets you closer!"
+    }),
+    (mergedValue: number) => ({
+        title: "🧮 Fast Math",
+        text: "To multiply a whole number by 10, you just add a 0 to the end of the number!"
+    }),
+    (mergedValue: number) => ({
+        title: "🚀 Space Math",
+        text: "Math is the universal language. We even used it to send messages to aliens on the Voyager Golden Record!"
+    }),
+    (mergedValue: number) => ({
+        title: "⚖️ Balancing Act",
+        text: "An equation is like a scale. Whatever you do to one side, you must do to the other to keep it balanced."
+    }),
+    (mergedValue: number) => ({
+        title: "♾️ Infinity",
+        text: "There are infinitely many numbers. No matter how big a number you can think of, there is always one bigger!"
+    })
+];
 
 interface EducationOverlayProps {
     board: BoardState;
     enabled: boolean;
+    lockFrequency?: number;
+    onLock?: (locked: boolean) => void;
+    onMerge?: (text: string, isChallenge: boolean) => void;
 }
 
 interface ToastInfo {
@@ -14,13 +87,15 @@ interface ToastInfo {
     c: number;
 }
 
-export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabled }) => {
+export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabled, lockFrequency, onLock, onMerge }) => {
     const { registerMerge, registerChallengeAnswer } = useEducation();
     const [toasts, setToasts] = useState<ToastInfo[]>([]);
-    const [popup, setPopup] = useState<{ type: 'why' | 'challenge', value?: number } | null>(null);
+    const [popup, setPopup] = useState<{ type: 'why' | 'challenge' | 'lock_challenge', value?: number, expr?: string, options?: string[], correctOption?: string } | null>(null);
     const [challengeOptions, setChallengeOptions] = useState<number[]>([]);
     const [challengeHint, setChallengeHint] = useState<string>('');
     const prevBoardRef = useRef<string>('');
+    const mergesSinceLastChallenge = useRef(0);
+    const factOrderRef = useRef<number[]>([]);
 
     useEffect(() => {
         if (!enabled) return;
@@ -38,13 +113,28 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                     mergedValue = cell.value;
                     const half = cell.value / 2;
                     let text = `${half} + ${half} = ${cell.value} — combined equal numbers!`;
-                    if (cell.value >= 16 && cell.value < 128) {
-                        text = `Doubled! ${half} + ${half} = ${cell.value}`;
-                    } else if (cell.value >= 128) {
-                        text = `Power of 2: ${cell.value}!`;
+                    if (cell.mergeInfo) {
+                        const { expr1, expr2 } = cell.mergeInfo;
+                        if (expr1.includes('+') || expr2.includes('+')) {
+                            text = `${expr1} = ${half} and ${expr2} = ${half} — adding up to the same thing!`;
+                        } else if (expr1.includes('-') || expr2.includes('-')) {
+                            text = `${expr1} = ${half} and ${expr2} = ${half} — subtraction matching up!`;
+                        } else if (expr1.includes('×') || expr2.includes('×')) {
+                            text = `${expr1} and ${expr2} both evaluate to ${half}!`;
+                        } else {
+                            text = `${expr1} = ${half} and ${expr2} = ${half} — different expressions, same value!`;
+                        }
+                        registerMerge(cell.value, expr1, expr2);
+                        if (onMerge) {
+                            const formatExpr = (e: string) => e.includes('+') || e.includes('-') || e.includes('×') || e.includes('÷') ? `(${e})` : e;
+                            onMerge(`${formatExpr(expr1)} + ${formatExpr(expr2)} = ${cell.value}`, false);
+                        }
+                    } else {
+                        registerMerge(cell.value);
+                        if (onMerge) onMerge(`${half} + ${half} = ${cell.value}`, false);
                     }
                     newToasts.push({ id: cell.id, text, r, c });
-                    registerMerge(cell.value);
+                    mergesSinceLastChallenge.current += 1;
                 }
             });
         });
@@ -53,18 +143,60 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
             setToasts(newToasts);
             const timer = setTimeout(() => setToasts([]), 2000);
             
-            // Randomly trigger popups (only if one isn't active)
             if (!popup) {
-                const rand = Math.random();
-                if (rand < 0.1 && mergedValue >= 8) {
-                    setPopup({ type: 'why', value: mergedValue });
-                } else if (rand > 0.9 && mergedValue >= 8) {
-                    // Challenge
-                    const correct = mergedValue * 2;
-                    const opts = [correct, correct - 2, correct + 4, correct / 2].sort(() => Math.random() - 0.5);
-                    setChallengeOptions(opts);
+                let chosenCell = null;
+                board.forEach(r => r.forEach(c => { if (c && c.mergedInto) chosenCell = c; }));
+
+                if (lockFrequency && lockFrequency > 0 && mergesSinceLastChallenge.current >= lockFrequency && chosenCell?.mergeInfo) {
+                    mergesSinceLastChallenge.current = 0;
+                    if (onLock) onLock(true);
+                    
+                    const ops: OperatorType[] = ['ADD', 'SUB', 'MUL', 'DIV'];
+                    const randomTarget = Math.floor(Math.random() * 30) + 5;
+                    const randomExprStr = generateExpression(randomTarget, ops);
+                    const correct = randomTarget;
+
+                    const opts = Array.from(new Set([correct, correct + 2, Math.max(1, correct - 2), correct * 2]));
+                    while (opts.length < 4) opts.push(opts[opts.length - 1] + 1);
+                    const shuffled = opts.sort(() => Math.random() - 0.5);
+
                     setChallengeHint('');
-                    setPopup({ type: 'challenge', value: mergedValue });
+                    setPopup({
+                        type: 'lock_challenge',
+                        value: correct,
+                        expr: randomExprStr,
+                        options: shuffled.map(String),
+                        correctOption: String(correct)
+                    });
+                } else {
+                    const rand = Math.random();
+                    if (rand < 0.1 && mergedValue >= 8) {
+                        if (factOrderRef.current.length === 0) {
+                            factOrderRef.current = MATH_FACTS.map((_, i) => i).sort(() => Math.random() - 0.5);
+                        }
+                        const nextFactIndex = factOrderRef.current.shift()!;
+                        const randomFact = MATH_FACTS[nextFactIndex](mergedValue);
+                        setPopup({ type: 'why', value: mergedValue, fact: randomFact });
+                    } else if (rand > 0.9 && mergedValue >= 8) {
+                        // Quick Challenge
+                        const ops: OperatorType[] = ['ADD', 'SUB', 'MUL', 'DIV'];
+                        const randomTarget = Math.floor(Math.random() * 20) + 5;
+                        const randomExprStr = generateExpression(randomTarget, ops);
+                        const correct = randomTarget;
+
+                        const opts = Array.from(new Set([correct, correct + 2, Math.max(1, correct - 2), correct * 2]));
+                        while (opts.length < 4) opts.push(opts[opts.length - 1] + 1);
+                        const shuffled = opts.sort(() => Math.random() - 0.5);
+
+                        setChallengeOptions(shuffled);
+                        setChallengeHint('');
+                        setPopup({ 
+                            type: 'challenge', 
+                            value: correct, 
+                            expr: randomExprStr,
+                            correctOption: String(correct)
+                        });
+                    }
                 }
             }
             
@@ -89,13 +221,17 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                 </div>
             ))}
 
-            {popup && popup.type === 'why' && (
+            {popup && popup.type === 'why' && popup.fact && (
                 <div className="modal-backdrop edu-popup">
-                    <div className="modal-content">
-                        <h2>🧠 Did you notice?</h2>
-                        <p>When two identical numbers merge, the result is double the original number.</p>
-                        <p><strong>{popup.value! / 2} + {popup.value! / 2} = {popup.value}</strong></p>
-                        <button className="btn btn-primary modal-close" onClick={() => setPopup(null)}>
+                    <div className="modal-content" style={{ textAlign: 'center' }}>
+                        <h2>{popup.fact.title}</h2>
+                        <p style={{ fontSize: '1.2rem', margin: '20px 0', color: '#e2e8f0' }}>{popup.fact.text}</p>
+                        {popup.fact.subtext && (
+                            <div style={{ background: 'rgba(255,255,255,0.1)', padding: '15px', borderRadius: '12px', fontSize: '1.3rem', fontWeight: 'bold', color: '#60a5fa' }}>
+                                {popup.fact.subtext}
+                            </div>
+                        )}
+                        <button className="btn btn-primary modal-close" style={{ marginTop: '25px' }} onClick={() => setPopup(null)}>
                             Got it! → Continue
                         </button>
                     </div>
@@ -106,19 +242,50 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                 <div className="modal-backdrop edu-challenge">
                     <div className="modal-content">
                         <h2>🎯 Quick Challenge</h2>
-                        <p>You have an {popup.value}. What number will you get if you merge it with another {popup.value}?</p>
-                        <div className="challenge-options">
+                        <p>Solve this quick math problem for extra points!</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '20px 0', textAlign: 'center', background: 'rgba(0,0,0,0.3)', padding: '15px', borderRadius: '12px' }}>{popup.expr} = ?</p>
+                        <div className="challenge-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                             {challengeOptions.map(opt => (
                                 <button 
                                     key={opt}
                                     className="challenge-option-btn"
                                     onClick={() => {
-                                        if (opt === popup.value! * 2) {
+                                        if (String(opt) === popup.correctOption) {
                                             registerChallengeAnswer(true);
                                             setPopup(null);
                                         } else {
                                             registerChallengeAnswer(false);
-                                            setChallengeHint(`💡 Hint: You're merging two ${popup.value}s. ${popup.value} + ${popup.value} = ?`);
+                                            setChallengeHint(`💡 Hint: ${popup.expr}`);
+                                        }
+                                    }}
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                        {challengeHint && <div className="challenge-hint">{challengeHint}</div>}
+                    </div>
+                </div>
+            )}
+
+            {popup && popup.type === 'lock_challenge' && (
+                <div className="modal-backdrop edu-challenge" style={{ background: 'rgba(15, 23, 42, 0.95)' }}>
+                    <div className="modal-content" style={{ border: '2px solid #ef4444', transform: 'translateY(-10vh)' }}>
+                        <h2>🔒 Solve to continue</h2>
+                        <p>To unlock the board, solve this random math challenge:</p>
+                        <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '20px 0', textAlign: 'center', background: 'rgba(0,0,0,0.3)', padding: '15px', borderRadius: '12px' }}>{popup.expr} = ?</p>
+                        <div className="challenge-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                            {popup.options?.map((opt, i) => (
+                                <button 
+                                    key={i}
+                                    className="challenge-option-btn"
+                                    onClick={() => {
+                                        if (opt === popup.correctOption) {
+                                            if (onLock) onLock(false);
+                                            if (onMerge) onMerge(`${popup.expr} = ${popup.value}`, true);
+                                            setPopup(null);
+                                        } else {
+                                            setChallengeHint(`💡 Hint: ${popup.expr}`);
                                         }
                                     }}
                                 >

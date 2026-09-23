@@ -45,16 +45,22 @@ export const NumberJourneyModal: React.FC<NumberJourneyModalProps> = ({ onClose 
 
                 <ul className="concept-checklist">
                     <li className={stats.conceptsUnlocked.addition ? 'learned' : ''}>
-                        {stats.conceptsUnlocked.addition ? '✅' : '🔒'} Addition of equal numbers (4+)
+                        {stats.conceptsUnlocked.addition ? '✅' : '🔒'} Addition
+                    </li>
+                    <li className={stats.conceptsUnlocked.subtraction ? 'learned' : ''}>
+                        {stats.conceptsUnlocked.subtraction ? '✅' : '🔒'} Subtraction
+                    </li>
+                    <li className={stats.conceptsUnlocked.multiplication ? 'learned' : ''}>
+                        {stats.conceptsUnlocked.multiplication ? '✅' : '🔒'} Multiplication
+                    </li>
+                    <li className={stats.conceptsUnlocked.division ? 'learned' : ''}>
+                        {stats.conceptsUnlocked.division ? '✅' : '🔒'} Division
                     </li>
                     <li className={stats.conceptsUnlocked.doubling ? 'learned' : ''}>
-                        {stats.conceptsUnlocked.doubling ? '✅' : '🔒'} Number doubling (16+)
-                    </li>
-                    <li className={stats.conceptsUnlocked.patterns ? 'learned' : ''}>
-                        {stats.conceptsUnlocked.patterns ? '✅' : '🔒'} Number patterns (64+)
+                        {stats.conceptsUnlocked.doubling ? '✅' : '🔒'} Number doubling
                     </li>
                     <li className={stats.conceptsUnlocked.powersOf2 ? 'learned' : ''}>
-                        {stats.conceptsUnlocked.powersOf2 ? '✅' : '🔒'} Powers of 2 (128+)
+                        {stats.conceptsUnlocked.powersOf2 ? '✅' : '🔒'} Powers of 2
                     </li>
                 </ul>
 

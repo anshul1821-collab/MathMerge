@@ -7,8 +7,10 @@ export interface EducationStats {
     totalChallenges: number;
     conceptsUnlocked: {
         addition: boolean;
+        subtraction: boolean;
+        multiplication: boolean;
+        division: boolean;
         doubling: boolean;
-        patterns: boolean;
         powersOf2: boolean;
     };
 }
@@ -20,8 +22,10 @@ const DEFAULT_STATS: EducationStats = {
     totalChallenges: 0,
     conceptsUnlocked: {
         addition: false,
+        subtraction: false,
+        multiplication: false,
+        division: false,
         doubling: false,
-        patterns: false,
         powersOf2: false,
     }
 };
@@ -43,7 +47,7 @@ export function useEducation() {
         localStorage.setItem('numberFusionLearning', JSON.stringify(stats));
     }, [stats]);
 
-    const registerMerge = useCallback((mergedValue: number) => {
+    const registerMerge = useCallback((mergedValue: number, expr1: string = '', expr2: string = '') => {
         setStats(prev => {
             const newStats = { 
                 ...prev, 
@@ -55,9 +59,13 @@ export function useEducation() {
                 newStats.highestNumber = mergedValue;
             }
             
-            if (mergedValue >= 4) newStats.conceptsUnlocked.addition = true;
+            const combinedExpr = expr1 + expr2;
+            if (combinedExpr.includes('+')) newStats.conceptsUnlocked.addition = true;
+            if (combinedExpr.includes('-')) newStats.conceptsUnlocked.subtraction = true;
+            if (combinedExpr.includes('×')) newStats.conceptsUnlocked.multiplication = true;
+            if (combinedExpr.includes('÷')) newStats.conceptsUnlocked.division = true;
+
             if (mergedValue >= 16) newStats.conceptsUnlocked.doubling = true;
-            if (mergedValue >= 64) newStats.conceptsUnlocked.patterns = true;
             if (mergedValue >= 128) newStats.conceptsUnlocked.powersOf2 = true;
             
             return newStats;

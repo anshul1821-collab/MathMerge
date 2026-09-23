@@ -7,6 +7,7 @@ export type TileData = {
     expression: string;
     mergedInto?: boolean;
     isNew?: boolean;
+    mergeInfo?: { expr1: string; expr2: string };
 };
 
 export type BoardState = (TileData | null)[][];
@@ -81,6 +82,7 @@ export function slide(board: BoardState, direction: 'UP' | 'DOWN' | 'LEFT' | 'RI
         for (let i = 0; i < row.length - 1; i++) {
             if (row[i].value === row[i+1].value) {
                 row[i].value *= 2;
+                row[i].mergeInfo = { expr1: row[i].expression, expr2: row[i+1].expression };
                 row[i].expression = generateExpression(row[i].value, ops);
                 row[i].mergedInto = true;
                 score += row[i].value;
