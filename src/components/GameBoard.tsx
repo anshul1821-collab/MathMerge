@@ -5,10 +5,11 @@ import { Tile } from './Tile';
 interface GameBoardProps {
     board: BoardState;
     showValue: boolean;
+    educationEnabled?: boolean;
     onMove: (direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT') => void;
 }
 
-export const GameBoard: React.FC<GameBoardProps> = ({ board, showValue, onMove }) => {
+export const GameBoard: React.FC<GameBoardProps> = ({ board, showValue, educationEnabled, onMove }) => {
     const touchStart = useRef<{ x: number; y: number } | null>(null);
 
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -56,6 +57,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({ board, showValue, onMove }
                                 showValue={showValue}
                                 isNew={cell.isNew}
                                 mergedInto={cell.mergedInto}
+                                mergeInfo={cell.mergeInfo}
+                                pendingPrediction={cell.pendingPrediction}
+                                educationEnabled={educationEnabled}
                             />
                         ) : null}
                     </div>

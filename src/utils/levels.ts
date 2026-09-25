@@ -1,3 +1,5 @@
+import type { EducationStats } from '../hooks/useEducation';
+
 export type OperatorType = 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'SQUARE' | 'SQRT' | 'ALGEBRA';
 
 export interface LevelConfig {
@@ -28,3 +30,23 @@ export const LEVELS: LevelConfig[] = [
     { level: 19, targetValue: 16384, ops: ['ALGEBRA', 'SQUARE', 'SQRT'] },
     { level: 20, targetValue: 16384, ops: ['ADD', 'SUB', 'MUL', 'DIV', 'SQUARE', 'SQRT', 'ALGEBRA'] },
 ];
+
+export function getAdaptiveLevelConfig(stats: EducationStats): LevelConfig {
+    let ops: OperatorType[] = ['ADD'];
+    const acc = stats.totalChallenges > 0 ? stats.correctChallenges / stats.totalChallenges : 1;
+    
+    if (stats.correctChallenges >= 5 && acc >= 0.5) ops.push('SUB');
+    if (stats.correctChallenges >= 10 && acc >= 0.6) ops.push('MUL');
+    if (stats.correctChallenges >= 15 && acc >= 0.6) ops.push('DIV');
+    if (stats.correctChallenges >= 25 && acc >= 0.7) ops.push('SQUARE');
+    if (stats.correctChallenges >= 35 && acc >= 0.7) ops.push('ALGEBRA');
+
+    let targetValue = 64;
+    if (stats.totalMerges > 50) targetValue = 128;
+    if (stats.totalMerges > 150) targetValue = 256;
+    if (stats.totalMerges > 300) targetValue = 512;
+    if (stats.totalMerges > 500) targetValue = 1024;
+    if (stats.totalMerges > 1000) targetValue = 2048;
+
+    return { level: -1, targetValue, ops };
+}

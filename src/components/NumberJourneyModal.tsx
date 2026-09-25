@@ -64,6 +64,30 @@ export const NumberJourneyModal: React.FC<NumberJourneyModalProps> = ({ onClose 
                     </li>
                 </ul>
 
+                <h3>Your Badges</h3>
+                <div className="stats-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                    <div className={`stat-item ${stats.badges?.additionAce ? 'unlocked-badge' : 'locked-badge'}`} style={{ opacity: stats.badges?.additionAce ? 1 : 0.5 }}>
+                        <div className="label">Addition Ace ➕</div>
+                        <div className="val" style={{ fontSize: '0.9rem' }}>{stats.badges?.additionAce ? 'Earned!' : '10 correct in a row'}</div>
+                    </div>
+                    <div className={`stat-item ${stats.badges?.subtractionSniper ? 'unlocked-badge' : 'locked-badge'}`} style={{ opacity: stats.badges?.subtractionSniper ? 1 : 0.5 }}>
+                        <div className="label">Subtraction Sniper ➖</div>
+                        <div className="val" style={{ fontSize: '0.9rem' }}>{stats.badges?.subtractionSniper ? 'Earned!' : '10 correct in a row'}</div>
+                    </div>
+                    <div className={`stat-item ${stats.badges?.multiplicationMaster ? 'unlocked-badge' : 'locked-badge'}`} style={{ opacity: stats.badges?.multiplicationMaster ? 1 : 0.5 }}>
+                        <div className="label">Multiplication Master ✖️</div>
+                        <div className="val" style={{ fontSize: '0.9rem' }}>{stats.badges?.multiplicationMaster ? 'Earned!' : '10 correct in a row'}</div>
+                    </div>
+                    <div className={`stat-item ${stats.badges?.divisionDynamo ? 'unlocked-badge' : 'locked-badge'}`} style={{ opacity: stats.badges?.divisionDynamo ? 1 : 0.5 }}>
+                        <div className="label">Division Dynamo ➗</div>
+                        <div className="val" style={{ fontSize: '0.9rem' }}>{stats.badges?.divisionDynamo ? 'Earned!' : '10 correct in a row'}</div>
+                    </div>
+                    <div className={`stat-item ${stats.badges?.predictionPro ? 'unlocked-badge' : 'locked-badge'}`} style={{ opacity: stats.badges?.predictionPro ? 1 : 0.5, gridColumn: 'span 2' }}>
+                        <div className="label">Prediction Pro 🔮</div>
+                        <div className="val" style={{ fontSize: '0.9rem' }}>{stats.badges?.predictionPro ? 'Earned!' : '20 total correct challenges'}</div>
+                    </div>
+                </div>
+
                 <button className="btn btn-primary modal-close" onClick={onClose}>Close</button>
             </div>
         </div>

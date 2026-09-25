@@ -8,6 +8,7 @@ export type TileData = {
     mergedInto?: boolean;
     isNew?: boolean;
     mergeInfo?: { expr1: string; expr2: string };
+    pendingPrediction?: boolean;
 };
 
 export type BoardState = (TileData | null)[][];
@@ -46,10 +47,11 @@ export function initializeBoard(ops: OperatorType[]): BoardState {
     return board;
 }
 
-export function slide(board: BoardState, direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT', ops: OperatorType[]) {
+export function slide(board: BoardState, direction: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT', ops: OperatorType[], predictCheck?: (e1: string, e2: string) => boolean) {
     let score = 0;
     let moved = false;
     let newBoard: BoardState = board.map(row => row.map(cell => cell ? { ...cell, isNew: false, mergedInto: false } : null));
+    let predictionTarget: TileData | null = null;
 
     const rotateLeft = (b: BoardState) => {
         const res: BoardState = Array(4).fill(null).map(() => Array(4).fill(null));
@@ -83,7 +85,15 @@ export function slide(board: BoardState, direction: 'UP' | 'DOWN' | 'LEFT' | 'RI
             if (row[i].value === row[i+1].value) {
                 row[i].value *= 2;
                 row[i].mergeInfo = { expr1: row[i].expression, expr2: row[i+1].expression };
-                row[i].expression = generateExpression(row[i].value, ops);
+                
+                if (predictCheck && predictCheck(row[i].expression, row[i+1].expression) && !predictionTarget) {
+                    row[i].pendingPrediction = true;
+                    row[i].expression = '?';
+                    predictionTarget = { ...row[i] };
+                } else {
+                    row[i].expression = generateExpression(row[i].value, ops);
+                }
+                
                 row[i].mergedInto = true;
                 score += row[i].value;
                 row.splice(i + 1, 1);
@@ -109,7 +119,7 @@ export function slide(board: BoardState, direction: 'UP' | 'DOWN' | 'LEFT' | 'RI
         newBoard = spawnTile(newBoard, ops);
     }
 
-    return { newBoard, score, moved };
+    return { newBoard, score, moved, predictionTarget };
 }
 
 export function isGameOver(board: BoardState) {

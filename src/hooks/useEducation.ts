@@ -5,6 +5,19 @@ export interface EducationStats {
     totalMerges: number;
     correctChallenges: number;
     totalChallenges: number;
+    streaks: {
+        add: number;
+        sub: number;
+        mul: number;
+        div: number;
+    };
+    badges: {
+        additionAce: boolean;
+        subtractionSniper: boolean;
+        multiplicationMaster: boolean;
+        divisionDynamo: boolean;
+        predictionPro: boolean;
+    };
     conceptsUnlocked: {
         addition: boolean;
         subtraction: boolean;
@@ -20,6 +33,16 @@ const DEFAULT_STATS: EducationStats = {
     totalMerges: 0,
     correctChallenges: 0,
     totalChallenges: 0,
+    streaks: {
+        add: 0, sub: 0, mul: 0, div: 0
+    },
+    badges: {
+        additionAce: false,
+        subtractionSniper: false,
+        multiplicationMaster: false,
+        divisionDynamo: false,
+        predictionPro: false,
+    },
     conceptsUnlocked: {
         addition: false,
         subtraction: false,
@@ -72,12 +95,36 @@ export function useEducation() {
         });
     }, []);
 
-    const registerChallengeAnswer = useCallback((correct: boolean) => {
-        setStats(prev => ({
-            ...prev,
-            totalChallenges: prev.totalChallenges + 1,
-            correctChallenges: prev.correctChallenges + (correct ? 1 : 0)
-        }));
+    const registerChallengeAnswer = useCallback((correct: boolean, expr: string = '') => {
+        setStats(prev => {
+            const newStats = {
+                ...prev,
+                totalChallenges: prev.totalChallenges + 1,
+                correctChallenges: prev.correctChallenges + (correct ? 1 : 0),
+                streaks: { ...prev.streaks },
+                badges: { ...prev.badges }
+            };
+
+            if (correct) {
+                if (expr.includes('+')) newStats.streaks.add += 1;
+                else if (expr.includes('-')) newStats.streaks.sub += 1;
+                else if (expr.includes('×')) newStats.streaks.mul += 1;
+                else if (expr.includes('÷')) newStats.streaks.div += 1;
+
+                if (newStats.streaks.add >= 10) newStats.badges.additionAce = true;
+                if (newStats.streaks.sub >= 10) newStats.badges.subtractionSniper = true;
+                if (newStats.streaks.mul >= 10) newStats.badges.multiplicationMaster = true;
+                if (newStats.streaks.div >= 10) newStats.badges.divisionDynamo = true;
+                if (newStats.correctChallenges >= 20) newStats.badges.predictionPro = true;
+            } else {
+                if (expr.includes('+')) newStats.streaks.add = 0;
+                else if (expr.includes('-')) newStats.streaks.sub = 0;
+                else if (expr.includes('×')) newStats.streaks.mul = 0;
+                else if (expr.includes('÷')) newStats.streaks.div = 0;
+            }
+
+            return newStats;
+        });
     }, []);
 
     const resetStats = useCallback(() => {

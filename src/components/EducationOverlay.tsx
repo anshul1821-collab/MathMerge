@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import type { BoardState, TileData } from '../utils/movement';
-import { useEducation } from '../hooks/useEducation';
 import { generateExpression } from '../utils/mathGen';
 import { LEVELS } from '../utils/levels';
 
@@ -99,6 +98,8 @@ interface EducationOverlayProps {
     lockFrequency?: number;
     onLock?: (locked: boolean) => void;
     onMerge?: (text: string, isChallenge: boolean) => void;
+    registerMerge: (mergedValue: number, expr1?: string, expr2?: string) => void;
+    registerChallengeAnswer: (correct: boolean, expr?: string) => void;
 }
 
 interface ToastInfo {
@@ -108,8 +109,7 @@ interface ToastInfo {
     c: number;
 }
 
-export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabled, level, lockFrequency, onLock, onMerge }) => {
-    const { registerMerge, registerChallengeAnswer } = useEducation();
+export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabled, level, lockFrequency, onLock, onMerge, registerMerge, registerChallengeAnswer }) => {
     const [toasts, setToasts] = useState<ToastInfo[]>([]);
     const [popup, setPopup] = useState<{ type: 'why' | 'challenge' | 'lock_challenge', value?: number, expr?: string, options?: string[], correctOption?: string, fact?: { title: string; text: string; subtext?: string; } } | null>(null);
     const [challengeOptions, setChallengeOptions] = useState<number[]>([]);
@@ -279,10 +279,10 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                                     className="challenge-option-btn"
                                     onClick={() => {
                                         if (String(opt) === popup.correctOption) {
-                                            registerChallengeAnswer(true);
+                                            registerChallengeAnswer(true, popup.expr);
                                             setPopup(null);
                                         } else {
-                                            registerChallengeAnswer(false);
+                                            registerChallengeAnswer(false, popup.expr);
                                             setChallengeHint(`💡 Hint: ${popup.expr}`);
                                         }
                                     }}
@@ -309,10 +309,12 @@ export const EducationOverlay: React.FC<EducationOverlayProps> = ({ board, enabl
                                     className="challenge-option-btn"
                                     onClick={() => {
                                         if (opt === popup.correctOption) {
+                                            registerChallengeAnswer(true, popup.expr);
                                             if (onLock) onLock(false);
                                             if (onMerge) onMerge(`${popup.expr} = ${popup.value}`, true);
                                             setPopup(null);
                                         } else {
+                                            registerChallengeAnswer(false, popup.expr);
                                             setChallengeHint(`💡 Hint: ${popup.expr}`);
                                         }
                                     }}

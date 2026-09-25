@@ -127,6 +127,11 @@ header h1 {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .btn:hover {
@@ -163,6 +168,7 @@ header h1 {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  min-height: 44px;
 }
 
 .game-container {
@@ -215,6 +221,33 @@ header h1 {
 
 .tile-merged {
   animation: popMerge 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.tile-merge-equation-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #fbbf24;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  animation: equationFadeOut 1s ease-in-out forwards;
+  pointer-events: none;
+  border: 1px solid rgba(251, 191, 36, 0.5);
+}
+
+@keyframes equationFadeOut {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.8); }
+  15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(0.8); }
 }
 
 @keyframes popIn {
@@ -376,6 +409,14 @@ header h1 {
 .settings-toggle {
   display: flex;
   justify-content: space-between;
+}
+
+.settings-toggle::-webkit-scrollbar {
+  height: 4px;
+}
+.settings-toggle::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
 .modal-close {
@@ -540,6 +581,8 @@ header h1 {
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .challenge-option-btn:hover {
@@ -634,6 +677,8 @@ header h1 {
   color: white;
   cursor: pointer;
   transition: all 0.3s;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .mode-btn.active {
@@ -663,5 +708,86 @@ header h1 {
 
 .concept-checklist li.learned {
   color: #4ade80;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 600px) {
+  .app-container {
+    padding: 10px;
+    gap: 15px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  .score-value {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.8rem;
+  }
+
+  .game-board {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .tile-expression {
+    font-size: 1.3rem;
+  }
+
+  .tile-value-subtext {
+    font-size: 0.75rem;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .settings-toggle {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .settings-toggle label {
+    padding: 6px 10px;
+  }
+
+  .settings-toggle label span {
+    font-size: 0.8rem;
+  }
+
+  .bouncy-title {
+    font-size: 3rem;
+  }
+
+  .start-description {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+  }
+
+  .pulse-btn {
+    font-size: 1.4rem;
+    padding: 12px 30px;
+  }
+
+  .game-overlay h2 {
+    font-size: 2rem;
+  }
+
+  .game-overlay p {
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
