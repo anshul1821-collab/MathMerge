@@ -397,6 +397,10 @@ function App() {
                                 <strong style={{ color: '#f59e0b' }}>🎯 Practice Mode</strong>
                                 <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', color: '#cbd5e1' }}>Create a custom sandbox by selecting exactly which math operators you want to practice with.</p>
                             </div>
+                            <div style={{ background: 'rgba(6, 182, 212, 0.1)', padding: '10px', borderRadius: '8px', borderLeft: '4px solid #06b6d4' }}>
+                                <strong style={{ color: '#22d3ee' }}>🚀 Number Journey</strong>
+                                <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', color: '#cbd5e1' }}>Track your progress! View your highest number reached, total merges, and accuracy on Quick Challenges. Earn badges by getting 10 correct answers in a row for different math operations.</p>
+                            </div>
                         </div>
 
                         <button className="btn btn-primary modal-close" onClick={() => setShowHowToPlay(false)} style={{ marginTop: '20px' }}>Got it!</button>
