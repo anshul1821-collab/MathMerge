@@ -131,7 +131,8 @@ function App() {
         return (
             <div className="start-screen-container">
                 <div className="start-screen-content">
-                    <h1 className="bouncy-title">Number Fusion</h1>
+                    <img src="/mathmerge-logo.png" alt="MathMerge Logo" style={{ width: '120px', height: '120px', marginBottom: '15px', borderRadius: '20px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
+                    <h1 className="bouncy-title">MathMerge</h1>
                     <p className="start-description">Combine math tiles and reach the target to win!</p>
                     <button className="btn btn-primary pulse-btn" onClick={() => setHasStarted(true)}>
                         Play Now! 🚀
@@ -145,7 +146,10 @@ function App() {
         <div className="app-container" style={{ maxWidth: '820px' }}>
             <header>
                 <div className="header-top">
-                    <h1>Number Fusion</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img src="/mathmerge-logo.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '8px' }} />
+                        <h1>MathMerge</h1>
+                    </div>
                     <div className="scores">
                         <div className="score-box level-box" onClick={() => setShowLevelSelect(true)} title="Click to change level">
                             <div className="score-label">{currentLevel === 0 ? 'PRACTICE' : currentLevel === -2 ? 'CLASSIC' : isAdaptiveMode ? 'ADAPTIVE' : `LEVEL ${currentLevel}`}</div>
@@ -432,7 +436,7 @@ function App() {
             {showFeatureIntro && (
                 <div className="modal-backdrop">
                     <div className="modal-content" style={{ maxWidth: '500px', textAlign: 'left' }}>
-                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>🌟 Welcome to Number Fusion!</h2>
+                        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>🌟 Welcome to MathMerge!</h2>
                         <p style={{ textAlign: 'center', color: '#cbd5e1', marginBottom: '20px' }}>Customize your learning experience with these special modes in the top menu:</p>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '25px' }}>
