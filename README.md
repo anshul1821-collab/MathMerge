@@ -1,32 +1,24 @@
-# React + TypeScript + Vite
+# MathMerge (Number Fusion)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+![MathMerge Logo](public/mathmerge-logo.png)
 
-Currently, two official plugins are available:
+Number Fusion (MathMerge) is an educational math puzzle game inspired by 2048. It combines addictive tile-merging mechanics with math challenges, helping players improve their calculation skills while having fun.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+*   **Educational Gameplay**: Solve equations and merge numbers to progress and reach the target number.
+*   **Multiple Modes**:
+    *   **Level Mode**: Progress through increasingly difficult levels.
+    *   **Practice Mode**: Hone your skills without the pressure.
+*   **Adaptive Challenges**: The game adjusts to your skill level.
+*   **Prediction & Challenge Modes**: Customize the frequency of math challenges and use prediction mode to anticipate your moves.
+*   **Number Journey**: Track your progress, solved equations, and unlocked numbers.
+*   **Interactive UI**: Smooth animations, sound effects, and a beautiful gradient-based design.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📸 Overview
 
-## Expanding the Oxlint configuration
+![Hero Image](src/assets/hero.png)
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 🎮 How to Play
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Use your arrow keys (or swipe on touch devices) to move the tiles. When tiles merge, you might encounter math equations and challenges! Reach the target number for each level to win, unlock your Number Journey, and improve your math skills along the way.
